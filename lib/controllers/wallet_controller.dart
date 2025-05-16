@@ -62,7 +62,7 @@ class WalletController extends GetxController {
             secretKey: descriptorSecretKey, network: network, keychain: e);
         descriptors.add(descriptor);
       }
-      descriptorString = descriptors[0].asString();
+
       return descriptors;
     } on Exception catch (e) {
       log(e.toString(), name: 'GetDescriptors');
