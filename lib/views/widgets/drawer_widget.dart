@@ -127,26 +127,26 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 1.h),
-          InkWell(
-            onTap: () {
-              context.push('/eventDetails');
+          // SizedBox(height: 1.h),
+          // InkWell(
+          //   onTap: () {
+          //     context.push('/eventDetails');
               
            
-            },
-            child: ListTile(
-              leading: Icon(Icons.settings,
-                  color: const Color(0xffb4914b), size: 24.px),
-              title: Text(
-                'Events',
-                style: TextStyle(
-                  color: const Color(0xffb4914b),
-                  fontSize: 24.px,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 1.h),
+          //   },
+          //   child: ListTile(
+          //     leading: Icon(Icons.settings,
+          //         color: const Color(0xffb4914b), size: 24.px),
+          //     title: Text(
+          //       'Events',
+          //       style: TextStyle(
+          //         color: const Color(0xffb4914b),
+          //         fontSize: 24.px,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(height: 1.h),
           
           // InkWell(
           //   onTap: () {
