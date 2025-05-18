@@ -130,28 +130,12 @@ class CustomDrawer extends StatelessWidget {
           SizedBox(height: 1.h),
           InkWell(
             onTap: () {
+              context.push('/eventDetails');
+              
            
             },
             child: ListTile(
               leading: Icon(Icons.settings,
-                  color: const Color(0xffb4914b), size: 24.px),
-              title: Text(
-                'Profile',
-                style: TextStyle(
-                  color: const Color(0xffb4914b),
-                  fontSize: 24.px,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 1.h),
-          
-          InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: ListTile(
-              leading: Icon(Icons.event,
                   color: const Color(0xffb4914b), size: 24.px),
               title: Text(
                 'Events',
@@ -163,22 +147,40 @@ class CustomDrawer extends StatelessWidget {
             ),
           ),
           SizedBox(height: 1.h),
-          InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: ListTile(
-              leading: Icon(Icons.settings,
-                  color: const Color(0xffb4914b), size: 24.px),
-              title: Text(
-                'Settings',
-                style: TextStyle(
-                  color: const Color(0xffb4914b),
-                  fontSize: 24.px,
-                ),
-              ),
-            ),
-          ),
+          
+          // InkWell(
+          //   onTap: () {
+          //     Navigator.pop(context);
+          //   },
+          //   child: ListTile(
+          //     leading: Icon(Icons.event,
+          //         color: const Color(0xffb4914b), size: 24.px),
+          //     title: Text(
+          //       'Events',
+          //       style: TextStyle(
+          //         color: const Color(0xffb4914b),
+          //         fontSize: 24.px,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(height: 1.h),
+          // InkWell(
+          //   onTap: () {
+          //     Navigator.pop(context);
+          //   },
+          //   child: ListTile(
+          //     leading: Icon(Icons.settings,
+          //         color: const Color(0xffb4914b), size: 24.px),
+          //     title: Text(
+          //       'Settings',
+          //       style: TextStyle(
+          //         color: const Color(0xffb4914b),
+          //         fontSize: 24.px,
+          //       ),
+          //     ),
+          //   ),
+          // ),
           SizedBox(height: 1.h),
           auth.canCheckBiometrics
               ? Obx(
@@ -219,23 +221,23 @@ class CustomDrawer extends StatelessWidget {
                 )
               : const SizedBox(),
           SizedBox(height: 6.h),
-          InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: ListTile(
-              leading: Icon(Icons.contacts,
-                  color: const Color(0xffb4914b), size: 24.px),
-              title: Text(
-                'Contact Us',
-                style: TextStyle(
-                  color: const Color(0xffb4914b),
-                  fontSize: 24.px,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 1.h),
+          // InkWell(
+          //   onTap: () {
+          //     Navigator.pop(context);
+          //   },
+          //   child: ListTile(
+          //     leading: Icon(Icons.contacts,
+          //         color: const Color(0xffb4914b), size: 24.px),
+          //     title: Text(
+          //       'Contact Us',
+          //       style: TextStyle(
+          //         color: const Color(0xffb4914b),
+          //         fontSize: 24.px,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(height: 1.h),
           InkWell(
             onTap: () async {
               await prefs.remove('mnemonic');

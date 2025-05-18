@@ -210,7 +210,7 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                  "Password must contain at least 1 uppercase letter, 1 number, and be at least 6 characters long"),
+                                  "Password must contain at least 1 uppercase letter, 1 number, 1 special character and should be at least 6 characters long"),
                               backgroundColor: Colors.red,
                             ),
                           );
