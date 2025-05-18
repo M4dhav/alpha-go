@@ -5,15 +5,21 @@ import 'package:alpha_go/controllers/event_controller.dart';
 import 'package:alpha_go/controllers/timeline_post_controller.dart';
 import 'package:alpha_go/controllers/user_controller.dart';
 import 'package:alpha_go/controllers/wallet_controller.dart';
+import 'package:alpha_go/models/collection_model.dart';
 import 'package:alpha_go/views/screens/base_view.dart';
 import 'package:alpha_go/views/screens/event_details_screen.dart';
 import 'package:alpha_go/views/screens/generate_mnemonic_screen.dart';
 import 'package:alpha_go/views/screens/import_mnemonic_screen.dart';
 import 'package:alpha_go/views/screens/legal_screen.dart';
+import 'package:alpha_go/views/screens/marketplace_screens/inscription_details_screen.dart';
+import 'package:alpha_go/views/screens/marketplace_screens/marketplace_base_screen.dart';
 import 'package:alpha_go/views/screens/mint_ordinals_screen.dart';
 import 'package:alpha_go/views/screens/onboarding.dart';
 import 'package:alpha_go/views/screens/search_screen.dart';
 import 'package:alpha_go/views/screens/send_token_screen.dart';
+import 'package:alpha_go/views/screens/marketplace_screens/ordinal_collection_details_screen.dart';
+import 'package:alpha_go/views/screens/marketplace_screens/ordinal_collection_screen.dart';
+import 'package:alpha_go/views/screens/testing_screens/ordinal_listing_screen.dart';
 import 'package:alpha_go/views/screens/wallet_created_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -90,6 +96,7 @@ class MyApp extends StatelessWidget {
             GoRoute(
               path: 'home',
               builder: (context, state) => const NavBar(),
+              // builder: (context, state) => OrdinalListingFormScreen(),
             ),
             GoRoute(
                 path: 'legal',
@@ -117,6 +124,7 @@ class MyApp extends StatelessWidget {
                     isImport: (state.extra as List)[1],
                   );
                 }),
+            
             GoRoute(
                 path: 'login',
                 builder: (context, state) {
@@ -161,6 +169,7 @@ class MyApp extends StatelessWidget {
                 return EventDetailsScreen(event: event, hosts: event.hosts);
               },
             ),
+             
             GoRoute(
                 path: 'storyDesigner',
                 builder: (context, state) => VSStoryDesigner(
@@ -171,6 +180,32 @@ class MyApp extends StatelessWidget {
                     mediaPath: state.extra as String,
                     middleBottomWidget: Container(),
                     centerText: '')),
+            GoRoute(
+              path: 'collectionDetails',
+              builder: (context, state) {
+                final collection = state.extra as OrdinalCollectionModel;
+                return CollectionDetailPage(collection: collection);
+              },
+            ),
+            GoRoute(path: 'marketplace', builder: (context, state) {
+              return const MarketPlaceBaseScreen();
+            }),
+            GoRoute(
+              path: 'exploreCollections',
+              builder: (context, state) {
+                return CollectionPage();
+              },
+            ),
+            GoRoute(
+                path: 'listOrdinal',
+                builder: (context, state) {
+                  return OrdinalListingScreen();
+                }),
+                GoRoute(
+                path: 'inscriptionDetails',
+                builder: (context, state) {
+                  return const InscriptionDetailPage();
+                }),
             GoRoute(
               path: 'eventDetails',
               builder: (context, state) => EventDetailsScreen(

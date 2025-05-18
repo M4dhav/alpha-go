@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final WalletController controller = Get.find();
   final UserController userController = Get.find();
   final TimelinePostController postController = Get.find();
-   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<double> getUsdtPrice() async {
     try {
@@ -234,7 +234,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 ),
                                               ),
                                               Text(
-                                                "Price in USDT: $price\$",
+                                                "Price in USDT: \$ $price",
                                                 style: TextStyle(
                                                   color:
                                                       const Color(0xffb4914b),
@@ -265,6 +265,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             // controller.sendSats(
                                             //     'tb1peaar2wwwpg05dm7jh6j43trvecxfhmmx6x3krznv3nrdthzfw54sz7xnsc',
                                             //     1000);
+                                            context.push('/marketplace');
                                           },
                                           icon: const Icon(Icons.arrow_upward),
                                           label: const Text(

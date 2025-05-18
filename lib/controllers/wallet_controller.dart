@@ -12,12 +12,14 @@ class WalletController extends GetxController {
   String? mnemonic;
   String? address;
   int? balance;
+  String? descriptorString;
   List<LocalUtxo> unspentTokens = [];
   Map<String, Map<String, dynamic>> ordinals = {};
   Map<String, Map<String, dynamic>> runes = {};
   final Network network = Network.bitcoin;
   List<dynamic> runeBalances = [];
   final int utxoChunkSize = 10;
+
 
   Future<void> generateMnemonicHandler() async {
     var res = await Mnemonic.create(WordCount.words12);
@@ -28,7 +30,9 @@ class WalletController extends GetxController {
     blockchain = await Blockchain.create(
       config: BlockchainConfig.esplora(
           config: EsploraConfig(
-        baseUrl: "https://blockstream.info/api/",
+        // baseUrl: "https://blockstream.info/api/",
+        baseUrl: "https://mempool.space/api",
+
         stopGap: BigInt.from(5),
         concurrency: 1,
       )),
@@ -61,7 +65,9 @@ class WalletController extends GetxController {
             secretKey: descriptorSecretKey, network: network, keychain: e);
         // final descriptor = await Descriptor.create(descriptor: '', network: Network.bitcoin);
         descriptors.add(descriptor);
+        
       }
+      descriptorString =  descriptors[0].asString();
       return descriptors;
     } on Exception catch (e) {
       log(e.toString(), name: 'GetDescriptors');
