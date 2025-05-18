@@ -267,6 +267,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             // controller.sendSats(
                                             //     'tb1peaar2wwwpg05dm7jh6j43trvecxfhmmx6x3krznv3nrdthzfw54sz7xnsc',
                                             //     1000);
+                                            context.push('/marketplace');
                                           },
                                           icon: const Icon(Icons.arrow_upward),
                                           label: const Text(

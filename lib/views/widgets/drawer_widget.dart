@@ -1,7 +1,7 @@
 
 import 'package:alpha_go/controllers/biometrics_controller.dart';
 import 'package:alpha_go/controllers/user_controller.dart';
-import 'package:alpha_go/views/screens/profile_screen.dart';
+
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -90,6 +90,7 @@ class CustomDrawer extends StatelessWidget {
               ],
             ),
           ),
+
           InkWell(
             onTap: () {
               while (context.canPop()) {
@@ -112,7 +113,24 @@ class CustomDrawer extends StatelessWidget {
           SizedBox(height: 1.h),
           InkWell(
             onTap: () {
-              Get.to(const ProfilePage());
+              context.push('/marketplace');
+            },
+            child: ListTile(
+              leading: Icon(Icons.store,
+                  color: const Color(0xffb4914b), size: 24.px),
+              title: Text(
+                'MarketPlace',
+                style: TextStyle(
+                  color: const Color(0xffb4914b),
+                  fontSize: 24.px,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 1.h),
+          InkWell(
+            onTap: () {
+           
             },
             child: ListTile(
               leading: Icon(Icons.settings,

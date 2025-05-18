@@ -32,7 +32,9 @@ class WalletController extends GetxController {
     blockchain = await Blockchain.create(
       config: BlockchainConfig.esplora(
           config: EsploraConfig(
-        baseUrl: "https://blockstream.info/api/",
+        // baseUrl: "https://blockstream.info/api/",
+        baseUrl: "https://mempool.space/api",
+
         stopGap: BigInt.from(5),
         concurrency: 1,
       )),
@@ -60,6 +62,7 @@ class WalletController extends GetxController {
             secretKey: descriptorSecretKey, network: network, keychain: e);
         descriptors.add(descriptor);
       }
+      descriptorString = descriptors[0].asString();
       return descriptors;
     } on Exception catch (e) {
       log(e.toString(), name: 'GetDescriptors');
