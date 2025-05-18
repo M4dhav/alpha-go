@@ -236,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 ),
                                               ),
                                               Text(
-                                                "Price in USDT: $price\$",
+                                                "Price in USDT: \$ $price",
                                                 style: TextStyle(
                                                   color:
                                                       const Color(0xffb4914b),
