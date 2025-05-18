@@ -19,7 +19,7 @@ import 'package:alpha_go/views/screens/search_screen.dart';
 import 'package:alpha_go/views/screens/send_token_screen.dart';
 import 'package:alpha_go/views/screens/marketplace_screens/ordinal_collection_details_screen.dart';
 import 'package:alpha_go/views/screens/marketplace_screens/ordinal_collection_screen.dart';
-import 'package:alpha_go/views/screens/testing_screens/ordinal_listing_screen.dart';
+import 'package:alpha_go/views/screens/marketplace_screens/ordinal_listing_screen.dart';
 import 'package:alpha_go/views/screens/wallet_created_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
