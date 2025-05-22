@@ -18,6 +18,9 @@ android/app/build/
 /.fvm/
 .fvmrc
 
+/.fvm/
+.fvmrc
+
 # IntelliJ related
 *.iml
 *.ipr

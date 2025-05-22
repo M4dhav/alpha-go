@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:alpha_go/models/const_model.dart';
 import 'package:bdk_flutter/bdk_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -460,17 +461,41 @@ class WalletController extends GetxController {
   //   debugPrint("PSBT stored for listing $listingId");
   // }
 
+  Future<void> createBip49Wallet() async {
+    final mnemonicObj = await Mnemonic.fromString(mnemonic!);
+    final descriptorSecretKey = await DescriptorSecretKey.create(
+      network: network,
+      mnemonic: mnemonicObj,
+    );
+    final bip49External = await Descriptor.newBip49(
+      secretKey: descriptorSecretKey,
+      network: network,
+      keychain: KeychainKind.externalChain,
+    );
+    final bip49Internal = await Descriptor.newBip49(
+      secretKey: descriptorSecretKey,
+      network: network,
+      keychain: KeychainKind.internalChain,
+    );
+    bip49Wallet = await Wallet.create(
+      descriptor: bip49External,
+      changeDescriptor: bip49Internal,
+      network: network,
+      databaseConfig: const DatabaseConfig.memory(),
+    );
+  }
+
   Future<void> sellerCreateAndStoreTransactionWithBip49({
     required LocalUtxo ordinalUtxo,
     required String sellerReceiveAddress,
     required String listingId,
   }) async {
     try {
-      if (fundingWallet == null) {
-        await createOrRestoreFundingWallet();
+      if (bip49Wallet == null) {
+        await createBip49Wallet();
       }
-      await fundingWallet!.sync(blockchain: blockchain);
-      final fundingUtxos = await ordinalWallet.listUnspent();
+      await bip49Wallet!.sync(blockchain: blockchain);
+      final fundingUtxos = await wallet.listUnspent();
       final builder = TxBuilder()
         ..addUtxos([ordinalUtxo.outpoint])
         ..addUtxos(fundingUtxos.map((u) => u.outpoint).toList())
@@ -482,9 +507,9 @@ class WalletController extends GetxController {
           ordinalUtxo.txout.value,
         )
         ..feeRate(1.0);
-      final (psbt, _) = await builder.finish(fundingWallet!);
-      await fundingWallet!.sign(psbt: psbt);
-      await ordinalWallet.sign(psbt: psbt);
+      final (psbt, _) = await builder.finish(bip49Wallet!);
+      await bip49Wallet!.sign(psbt: psbt);
+      await wallet.sign(psbt: psbt);
       final psbtBytes = await psbt.serialize();
       final psbtBase64 = base64Encode(psbtBytes);
       log('PRINT PSBT (BIP49) ' + psbtBase64);
