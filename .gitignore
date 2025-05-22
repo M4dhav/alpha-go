@@ -15,6 +15,9 @@ ios/firebase_app_id_file.json
 android/app/build/
 /lib/views/screens/testing-screens/
 /lib/views/screens/testing_screens/
+/.fvm/
+.fvmrc
+
 # IntelliJ related
 *.iml
 *.ipr

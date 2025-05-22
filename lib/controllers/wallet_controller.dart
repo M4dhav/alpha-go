@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:alpha_go/models/const_model.dart';
 import 'package:bdk_flutter/bdk_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class WalletController extends GetxController {
   late Blockchain blockchain;
   late Wallet wallet;
+  Wallet? bip49Wallet;
   String? password;
   String? mnemonic;
   String? address;
@@ -282,6 +284,7 @@ class WalletController extends GetxController {
     List<LocalUtxo> utxos,
   ) async {
     final TxBuilder txBuilder = TxBuilder();
+
     final Address receiverAddress =
         await Address.fromString(s: adrStr, network: network);
     final FeeRate fee = await blockchain.estimateFee(target: BigInt.from(1));
@@ -299,8 +302,6 @@ class WalletController extends GetxController {
     await blockchain.broadcast(transaction: tx);
     log(name: 'txid', tx.txid());
   }
-
-  Future<void> createInscription() async {}
 
   Future<void> getUtxo() async {
     // await syncWallet();
@@ -328,4 +329,201 @@ class WalletController extends GetxController {
       log("No unspent tokens");
     }
   }
+
+  // Future<void> sellerCreateAndStoreTransaction({
+  //   required Wallet wallet,
+  //   required LocalUtxo ordinalUtxo,
+  //   required String sellerReceiveAddress,
+  //   required String listingId,
+  // }) async {
+  //   final builder = TxBuilder()
+  //     // ..manuallySelectedOnly()
+  //     ..addUtxos([ordinalUtxo.outpoint])
+  //     // for (var ordinal in ordinals.values) {
+  //     //   if (ordinal['utxos'][0] != ordinalUtxo) {
+  //     //     builder.addUnSpendable(ordinal['utxos'][0].outpoint);
+  //     //   }
+  //     // }
+  //     // for (var rune in runes.values) {
+  //     //   for (var utxo in rune['utxos']) {
+  //     //     builder.addUnSpendable(utxo.outpoint);
+  //     //   }
+  //     // }
+  //     // builder
+  //     ..doNotSpendChange()
+  //     // ..drainWallet()
+  //     ..addRecipient(
+  //       (await Address.fromString(
+  //               s: sellerReceiveAddress, network: Network.bitcoin))
+  //           .scriptPubkey(),
+  //       ordinalUtxo.txout.value,
+  //     )
+  //     ..feeRate(1.0);
+  // }) async {
+  //   // 1. Get all UTXOs except the ordinal UTXO
+  //   final allUtxos = await wallet.listUnspent();
+  //   final feeUtxos =
+  //       allUtxos.where((u) => u.outpoint != ordinalUtxo.outpoint).toList();
+
+  //   // 2. Build the transaction
+  //   final builder = TxBuilder()
+  //     ..addUtxos([ordinalUtxo.outpoint]) // Add ordinal UTXO (for transfer)
+  //     ..addUtxos(
+  //         feeUtxos.map((u) => u.outpoint).toList()) // Add sats UTXOs for fee
+  //     ..doNotSpendChange() // Prevent spending change from ordinal UTXO
+  //     ..addRecipient(
+  //       (await Address.fromString(
+  //               s: sellerReceiveAddress, network: Network.bitcoin))
+  //           .scriptPubkey(),
+  //       ordinalUtxo.txout.value, // Output value must match input exactly!
+  //     )
+  //     ..feeRate(1.0);
+
+  //   final (psbt, _) = await builder.finish(wallet);
+  //   await wallet.sign(psbt: psbt);
+
+  //   final psbtBytes = await psbt.serialize();
+  //   final psbtBase64 = base64Encode(psbtBytes);
+
+  //   log('PRINT PSBT          ' + psbtBase64);
+  // final listing = OrdinalListing(
+  //   id: listingId,
+  //   psbtBase64: psbtBase64,
+  //   timestamp: null,
+  //   status: 'available',
+  //   ordinalOutpoint: ordinalUtxo.outpoint.toString(),
+  //   value: ordinalUtxo.txout.value.toString(),
+  //   sellerAddress: sellerReceiveAddress,
+  //   buyerAddress: null,
+  //   broadcastTxid: null,
+  //   broadcastTime: null,
+  // );
+
+  // await FirebaseFirestore.instance
+  //     .collection('ordinal_listing')
+  //     .doc(listingId)
+  //     .set({
+  //   ...listing.toMap(),
+  //   'timestamp': FieldValue.serverTimestamp(),
+  // });
+
+  //   debugPrint("PSBT stored for listing $listingId");
+  // }
+
+  Future<void> createBip49Wallet() async {
+    final mnemonicObj = await Mnemonic.fromString(mnemonic!);
+    final descriptorSecretKey = await DescriptorSecretKey.create(
+      network: network,
+      mnemonic: mnemonicObj,
+    );
+    final bip49External = await Descriptor.newBip49(
+      secretKey: descriptorSecretKey,
+      network: network,
+      keychain: KeychainKind.externalChain,
+    );
+    final bip49Internal = await Descriptor.newBip49(
+      secretKey: descriptorSecretKey,
+      network: network,
+      keychain: KeychainKind.internalChain,
+    );
+    bip49Wallet = await Wallet.create(
+      descriptor: bip49External,
+      changeDescriptor: bip49Internal,
+      network: network,
+      databaseConfig: const DatabaseConfig.memory(),
+    );
+  }
+
+  Future<void> sellerCreateAndStoreTransactionWithBip49({
+    required LocalUtxo ordinalUtxo,
+    required String sellerReceiveAddress,
+    required String listingId,
+  }) async {
+    try {
+      if (bip49Wallet == null) {
+        await createBip49Wallet();
+      }
+      await bip49Wallet!.sync(blockchain: blockchain);
+      final fundingUtxos = await wallet.listUnspent();
+      final builder = TxBuilder()
+        ..addUtxos([ordinalUtxo.outpoint])
+        ..addUtxos(fundingUtxos.map((u) => u.outpoint).toList())
+        ..doNotSpendChange()
+        ..addRecipient(
+          (await Address.fromString(
+                  s: sellerReceiveAddress, network: Network.bitcoin))
+              .scriptPubkey(),
+          ordinalUtxo.txout.value,
+        )
+        ..feeRate(1.0);
+      final (psbt, _) = await builder.finish(bip49Wallet!);
+      await bip49Wallet!.sign(psbt: psbt);
+      await wallet.sign(psbt: psbt);
+      final psbtBytes = await psbt.serialize();
+      final psbtBase64 = base64Encode(psbtBytes);
+      log('PRINT PSBT (BIP49) ' + psbtBase64);
+      debugPrint("PSBT stored for listing $listingId");
+    } catch (e, st) {
+      log('Error in sellerCreateAndStoreTransactionWithBip49: $e\n$st');
+      debugPrint('Error in sellerCreateAndStoreTransactionWithBip49: $e');
+    }
+  }
+  // Future<void> buyerRetrieveAndBroadcast({
+  //   required Wallet wallet,
+  //   required Blockchain blockchain,
+  //   required String listingId,
+  //   required String buyerReceiveAddress,
+  //   required List<LocalUtxo> buyerUtxos,
+  // }) async {
+  //   final doc = await FirebaseFirestore.instance
+  //       .collection('ordinal_listing')
+  //       .doc(listingId)
+  //       .get();
+
+  //   final listing = OrdinalListing.fromFirestore(doc);
+
+  //   if (listing.psbtBase64.isEmpty ||
+  //       listing.value.isEmpty ||
+  //       listing.sellerAddress.isEmpty) {
+  //     throw Exception("Incomplete listing data for $listingId");
+  //   }
+
+  //   final psbt =
+  //       await PartiallySignedTransaction.fromString(listing.psbtBase64);
+
+  //   final buyerAddress = await Address.fromString(
+  //       s: buyerReceiveAddress, network: Network.bitcoin);
+  //   final script = buyerAddress.scriptPubkey();
+
+  //   final builder = TxBuilder()
+  //     ..addUtxos(buyerUtxos.map((e) => e.outpoint).toList())
+  //     ..addRecipient(
+  //       (await Address.fromString(
+  //               s: listing.sellerAddress, network: Network.bitcoin))
+  //           .scriptPubkey(),
+  //       BigInt.parse(listing.value),
+  //     )
+  //     ..addRecipient(script, BigInt.from(1)) // Change to buyer (mock value)
+  //     ..feeRate(1.5);
+
+  //   final (buyerPsbt, _) = await builder.finish(wallet);
+
+  //   final combinedPsbt = await psbt.combine(buyerPsbt);
+  //   await wallet.sign(psbt: combinedPsbt);
+
+  //   final tx = await combinedPsbt.extractTx();
+  //   final txId = await blockchain.broadcast(transaction: tx);
+
+  //   await FirebaseFirestore.instance
+  //       .collection('ordinal_listing')
+  //       .doc(listingId)
+  //       .update({
+  //     'status': 'sold',
+  //     'broadcast_txid': txId,
+  //     'broadcast_time': FieldValue.serverTimestamp(),
+  //     'buyerAddress': buyerReceiveAddress,
+  //   });
+
+  //   debugPrint("Broadcasted txid: $txId for listing $listingId");
+  // }
 }

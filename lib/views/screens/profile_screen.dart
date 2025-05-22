@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final WalletController controller = Get.find();
   final UserController userController = Get.find();
   final TimelinePostController postController = Get.find();
-   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<double> getUsdtPrice() async {
     try {
@@ -401,9 +401,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                 return Image.network(
                                     token['info']['content_url']);
                               } else if (type.contains("text")) {
-                                return Text(
-                                  token['info']['contents'],
-                                  textAlign: TextAlign.center,
+                                return GestureDetector(
+                                  onTap: () async {
+                                    log("tranc a tsrating                         ");
+                                    await controller
+                                        .sellerCreateAndStoreTransactionWithBip49(
+                                      listingId: "jbhkdjcbc",
+                                      ordinalUtxo: token['utxos'][0],
+                                      sellerReceiveAddress:
+                                          userController.user.walletAddress,
+                                    );
+                                  },
+                                  child: Text(
+                                    token['info']['contents'],
+                                    textAlign: TextAlign.center,
+                                  ),
                                 );
                               } else {
                                 return Container();

@@ -2,7 +2,7 @@ name: alpha_go
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.1.0
 
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+  sdk: ">=3.4.3 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -31,34 +31,33 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons:
-  # bdk_flutter: 
+  # bdk_flutter:
   #   path: packages\bdk_flutter-0.31.2
   bdk_flutter:
     git:
-      url: https://github.com/M4dhav/bdk-flutter.git 
+      url: https://github.com/M4dhav/bdk-flutter.git
   latlong2:
-  image: 
-  flutter_cache_manager: 
+  image:
+  flutter_cache_manager:
   animated_toggle_switch: ^0.8.3
   animated_bottom_navigation_bar: ^1.3.3
   permission_handler: ^12.0.0+1
-  url_launcher: 
+  url_launcher:
   geolocator:
   searchfield: ^1.1.7
   get:
   buttons_tabbar:
-  shared_preferences: ^2.4.0 
+  shared_preferences: ^2.4.0
   cloud_firestore:
   firebase_core:
   firebase_messaging:
-  firebase_storage: 
-  flutter_firebase_chat_core: 
-  flutter_chat_ui: 
-  firebase_auth: 
+  firebase_storage:
+  flutter_firebase_chat_core:
+  flutter_chat_ui:
+  firebase_auth:
   image_picker: ^1.1.2
   responsive_sizer: ^3.3.1
   mapbox_maps_flutter: ^2.8.0
@@ -67,7 +66,7 @@ dependencies:
   path_provider: any
   intl: ^0.20.0
   avatar_stack: ^3.0.0
-  cached_network_image: 
+  cached_network_image: ^3.4.0
   vs_story_designer:
     git:
       url: https://github.com/M4dhav/vs_story_designer.git
@@ -76,7 +75,6 @@ dependencies:
   local_auth: ^2.3.0
   flutter_dotenv: ^5.2.1
   flutter_image_gallery_saver: ^0.0.2
-  
 
 dependency_overrides:
   # image_gallery_saver:
@@ -100,7 +98,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
