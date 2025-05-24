@@ -47,7 +47,7 @@ dependencies:
   permission_handler: ^12.0.0+1
   url_launcher:
   geolocator:
-  searchfield: ^1.1.7
+  # searchfield: ^1.1.7
   get:
   buttons_tabbar:
   shared_preferences: ^2.4.0
@@ -70,13 +70,14 @@ dependencies:
   vs_story_designer:
     git:
       url: https://github.com/M4dhav/vs_story_designer.git
+      ref: 6bbfdb8
   share_plus: ^10.0.0
   go_router: ^15.1.1
   local_auth: ^2.3.0
   flutter_dotenv: ^5.2.1
   flutter_image_gallery_saver: ^0.0.2
 
-dependency_overrides:
+# dependency_overrides:
   # image_gallery_saver:
   #   git:
   #     url: https://github.com/knottx/image_gallery_saver.git

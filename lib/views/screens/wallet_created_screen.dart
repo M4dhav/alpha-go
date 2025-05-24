@@ -28,16 +28,17 @@ class _WalletCreatedScreenState extends State<WalletCreatedScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await controller.createOrRestoreWallet().then((value) {
+      await controller.createOrRestoreOrdinalWallet().then((value) {
         setState(() {
-          address.text = controller.address!;
+          address.text = controller.ordinalAddress!;
         });
       });
+      await controller.createOrRestoreFundingWallet();
 
       try {
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
-          email: "${controller.address!}@alphago.com",
+          email: "${controller.ordinalAddress!}@alphago.com",
           password: controller.password!,
         )
             .then((value) async {
@@ -49,7 +50,7 @@ class _WalletCreatedScreenState extends State<WalletCreatedScreen> {
         } else if (e.code == 'email-already-in-use') {
           log('The account already exists for that email.');
           await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: "${controller.address}@alphago.com",
+            email: "${controller.ordinalAddress}@alphago.com",
             password: controller.password!,
           );
         }
@@ -114,9 +115,10 @@ class _WalletCreatedScreenState extends State<WalletCreatedScreen> {
                                 suffixIconColor: const Color(0xffb4914b),
                                 suffixIcon: IconButton(
                                     onPressed: () async {
-                                      if (controller.address != null) {
+                                      if (controller.ordinalAddress != null) {
                                         await Clipboard.setData(ClipboardData(
-                                                text: controller.address!))
+                                                text:
+                                                    controller.ordinalAddress!))
                                             .then((onCallback) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
@@ -160,9 +162,11 @@ class _WalletCreatedScreenState extends State<WalletCreatedScreen> {
                               isLoading = true;
                             });
                             await controller.syncWallet();
-                            await controller.getBalance().then((value) {
+                            await controller
+                                .getOrdinalWalletBalance()
+                                .then((value) {
                               balance.text =
-                                  "${controller.balance.toString()} Sats";
+                                  "${controller.ordinalWalletBalance.toString()} Sats";
                             });
                             setState(() {
                               isLoading = false;

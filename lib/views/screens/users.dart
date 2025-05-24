@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:searchfield/searchfield.dart';
+// import 'package:searchfield/searchfield.dart';
 
 class UsersPage extends StatefulWidget {
   const UsersPage({super.key});
@@ -68,24 +68,24 @@ class _UsersPageState extends State<UsersPage> {
             foregroundColor: const Color(0xffb4914b),
             bottom: Constants.appBarBottom,
             systemOverlayStyle: SystemUiOverlayStyle.light,
-            title: SearchField<String>(
-              searchInputDecoration: SearchInputDecoration(
-                  hintText: 'Search',
-                  cursorColor: Colors.white,
-                  hintStyle: const TextStyle(
-                    color: Color(0xffb4914b),
-                  )),
-              marginColor: const Color(0xffb4914b),
-              suggestions: countries
-                  .map(
-                    (e) => SearchFieldListItem<String>(e,
-                        item: e,
-                        // Use child to show Custom Widgets in the suggestions
-                        // defaults to Text widget
-                        child: Text(e)),
-                  )
-                  .toList(),
-            ),
+            // title: SearchField<String>(
+            //   searchInputDecoration: SearchInputDecoration(
+            //       hintText: 'Search',
+            //       cursorColor: Colors.white,
+            //       hintStyle: const TextStyle(
+            //         color: Color(0xffb4914b),
+            //       )),
+            //   marginColor: const Color(0xffb4914b),
+            //   suggestions: countries
+            //       .map(
+            //         (e) => SearchFieldListItem<String>(e,
+            //             item: e,
+            //             // Use child to show Custom Widgets in the suggestions
+            //             // defaults to Text widget
+            //             child: Text(e)),
+            //       )
+            //       .toList(),
+            // ),
           ),
           body: StreamBuilder<List<types.User>>(
             stream: FirebaseChatCore.instance.users(),

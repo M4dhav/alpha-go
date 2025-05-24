@@ -8,12 +8,14 @@ import 'package:http/http.dart' as http;
 
 class WalletController extends GetxController {
   late Blockchain blockchain;
-  late Wallet wallet;
-  Wallet? bip49Wallet;
+  late Wallet ordinalWallet;
+  late Wallet fundingWallet;
   String? password;
   String? mnemonic;
-  String? address;
-  int? balance;
+  String? ordinalAddress;
+  String? fundingAddress;
+  int? ordinalWalletBalance;
+  int? fundingWalletBalance;
   List<LocalUtxo> unspentTokens = [];
   Map<String, Map<String, dynamic>> ordinals = {};
   Map<String, Map<String, dynamic>> runes = {};
@@ -45,7 +47,7 @@ class WalletController extends GetxController {
     return blockchain;
   }
 
-  Future<List<Descriptor>> getDescriptors(String mnemonic) async {
+  Future<List<Descriptor>> getOrdinalDescriptors(String mnemonic) async {
     final descriptors = <Descriptor>[];
     try {
       for (var e in [KeychainKind.externalChain, KeychainKind.internalChain]) {
@@ -54,14 +56,8 @@ class WalletController extends GetxController {
           network: network,
           mnemonic: mnemonicObj,
         );
-        // final descriptor = await Descriptor.newBip84(
-        //   secretKey: descriptorSecretKey,
-        //   network: Network.bitcoin,
-        //   keychain: e,
-        // );
         final descriptor = await Descriptor.newBip86(
             secretKey: descriptorSecretKey, network: network, keychain: e);
-        // final descriptor = await Descriptor.create(descriptor: '', network: Network.bitcoin);
         descriptors.add(descriptor);
       }
       return descriptors;
@@ -71,45 +67,96 @@ class WalletController extends GetxController {
     }
   }
 
-  Future<void> createOrRestoreWallet() async {
+  Future<void> createOrRestoreOrdinalWallet() async {
     try {
-      final descriptors = await getDescriptors(mnemonic!);
+      final descriptors = await getOrdinalDescriptors(mnemonic!);
       await blockchainInit();
       final res = await Wallet.create(
           descriptor: descriptors[0],
           changeDescriptor: descriptors[1],
           network: network,
           databaseConfig: const DatabaseConfig.memory());
-      wallet = res;
-      await getAddress();
+      ordinalWallet = res;
+      await getOrdinalAddress();
+    } on Exception catch (e) {
+      log(e.toString(), name: 'CreateOrdinalWallet');
+      rethrow;
+    }
+  }
+
+  Future<List<Descriptor>> getFundingDescriptors(String mnemonic) async {
+    final descriptors = <Descriptor>[];
+    try {
+      for (var e in [KeychainKind.externalChain, KeychainKind.internalChain]) {
+        final mnemonicObj = await Mnemonic.fromString(mnemonic);
+        final descriptorSecretKey = await DescriptorSecretKey.create(
+          network: network,
+          mnemonic: mnemonicObj,
+        );
+        final descriptor = await Descriptor.newBip49(
+            secretKey: descriptorSecretKey, network: network, keychain: e);
+
+        descriptors.add(descriptor);
+      }
+      return descriptors;
+    } on Exception catch (e) {
+      log(e.toString(), name: 'GetDescriptorsFunding');
+      rethrow;
+    }
+  }
+
+  Future<void> createOrRestoreFundingWallet() async {
+    try {
+      final descriptors = await getFundingDescriptors(mnemonic!);
+      final res = await Wallet.create(
+          descriptor: descriptors[0],
+          changeDescriptor: descriptors[1],
+          network: network,
+          databaseConfig: const DatabaseConfig.memory());
+      fundingWallet = res;
+      await getFundingAddress();
     } on Exception catch (e) {
       log(e.toString(), name: 'CreateWallet');
       rethrow;
     }
   }
 
-  Future<void> getAddress() async {
+  Future<void> getOrdinalAddress() async {
     final addressInfo =
-        wallet.getAddress(addressIndex: const AddressIndex.increase());
-    address = addressInfo.address.toString();
+        ordinalWallet.getAddress(addressIndex: const AddressIndex.increase());
+    ordinalAddress = addressInfo.address.toString();
   }
 
-  Future<void> getBalance() async {
-    await syncWallet();
-    final balanceObj = wallet.getBalance();
+  Future<void> getFundingAddress() async {
+    final addressInfo =
+        fundingWallet.getAddress(addressIndex: const AddressIndex.increase());
+    fundingAddress = addressInfo.address.toString();
+  }
+
+  Future<void> getOrdinalWalletBalance() async {
+    final balanceObj = ordinalWallet.getBalance();
     final res = "Total Balance: ${balanceObj.total.toString()}";
     log(res);
-    balance = balanceObj.total.toInt();
+    ordinalWalletBalance = balanceObj.total.toInt();
+  }
+
+  Future<void> getFundingWalletBalance() async {
+    final balanceObj = fundingWallet.getBalance();
+    final res = "Total Balance: ${balanceObj.total.toString()}";
+    log(res);
+    fundingWalletBalance = balanceObj.total.toInt();
   }
 
   Future<void> syncWallet() async {
-    await wallet.sync(blockchain: blockchain);
+    await ordinalWallet.sync(blockchain: blockchain);
+    await fundingWallet.sync(blockchain: blockchain);
     log('Wallet synced');
   }
 
   Future<void> initWallet() async {
     await syncWallet();
-    await getBalance();
+    await getOrdinalWalletBalance();
+    await getFundingWalletBalance();
     await getUtxo();
   }
 
@@ -140,7 +187,7 @@ class WalletController extends GetxController {
             jsonDecode(response.body)['results'] ?? []);
         if (results.isNotEmpty) {
           Map<String, dynamic> rune = results.firstWhere(
-            (item) => item["address"] == address,
+            (item) => item["address"] == ordinalAddress,
             orElse: () => {},
           );
           String runeId = rune['rune']['id'].toString();
@@ -270,9 +317,9 @@ class WalletController extends GetxController {
         .addRecipient(script, BigInt.from(amount))
         // .addUtxo(outpoint)
         .feeRate(1.0)
-        .finish(wallet);
+        .finish(ordinalWallet);
 
-    final sbt = wallet.sign(psbt: psbt.$1);
+    final sbt = ordinalWallet.sign(psbt: psbt.$1);
     final tx = psbt.$1.extractTx();
     await blockchain.broadcast(transaction: tx);
     log(name: 'txid', tx.txid());
@@ -295,9 +342,9 @@ class WalletController extends GetxController {
         .doNotSpendChange()
         .addUtxos(List.from(utxos.map((e) => e.outpoint)))
         .feeRate(1.0)
-        .finish(wallet);
+        .finish(ordinalWallet);
 
-    final sbt = wallet.sign(psbt: psbt.$1);
+    final sbt = ordinalWallet.sign(psbt: psbt.$1);
     final tx = psbt.$1.extractTx();
     await blockchain.broadcast(transaction: tx);
     log(name: 'txid', tx.txid());
@@ -307,7 +354,7 @@ class WalletController extends GetxController {
     // await syncWallet();
     runes.clear();
     ordinals.clear();
-    unspentTokens = wallet.listUnspent();
+    unspentTokens = ordinalWallet.listUnspent();
     for (var element in unspentTokens) {
       log(element.outpoint.txid);
     }
@@ -410,41 +457,17 @@ class WalletController extends GetxController {
   //   debugPrint("PSBT stored for listing $listingId");
   // }
 
-  Future<void> createBip49Wallet() async {
-    final mnemonicObj = await Mnemonic.fromString(mnemonic!);
-    final descriptorSecretKey = await DescriptorSecretKey.create(
-      network: network,
-      mnemonic: mnemonicObj,
-    );
-    final bip49External = await Descriptor.newBip49(
-      secretKey: descriptorSecretKey,
-      network: network,
-      keychain: KeychainKind.externalChain,
-    );
-    final bip49Internal = await Descriptor.newBip49(
-      secretKey: descriptorSecretKey,
-      network: network,
-      keychain: KeychainKind.internalChain,
-    );
-    bip49Wallet = await Wallet.create(
-      descriptor: bip49External,
-      changeDescriptor: bip49Internal,
-      network: network,
-      databaseConfig: const DatabaseConfig.memory(),
-    );
-  }
-
   Future<void> sellerCreateAndStoreTransactionWithBip49({
     required LocalUtxo ordinalUtxo,
     required String sellerReceiveAddress,
     required String listingId,
   }) async {
     try {
-      if (bip49Wallet == null) {
-        await createBip49Wallet();
+      if (fundingWallet == null) {
+        await createOrRestoreFundingWallet();
       }
-      await bip49Wallet!.sync(blockchain: blockchain);
-      final fundingUtxos = await wallet.listUnspent();
+      await fundingWallet!.sync(blockchain: blockchain);
+      final fundingUtxos = await ordinalWallet.listUnspent();
       final builder = TxBuilder()
         ..addUtxos([ordinalUtxo.outpoint])
         ..addUtxos(fundingUtxos.map((u) => u.outpoint).toList())
@@ -456,9 +479,9 @@ class WalletController extends GetxController {
           ordinalUtxo.txout.value,
         )
         ..feeRate(1.0);
-      final (psbt, _) = await builder.finish(bip49Wallet!);
-      await bip49Wallet!.sign(psbt: psbt);
-      await wallet.sign(psbt: psbt);
+      final (psbt, _) = await builder.finish(fundingWallet!);
+      await fundingWallet!.sign(psbt: psbt);
+      await ordinalWallet.sign(psbt: psbt);
       final psbtBytes = await psbt.serialize();
       final psbtBase64 = base64Encode(psbtBytes);
       log('PRINT PSBT (BIP49) ' + psbtBase64);

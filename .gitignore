@@ -54,3 +54,4 @@ app.*.map.json
 /windows/
 /linux/
 /macos/
+ios/build/

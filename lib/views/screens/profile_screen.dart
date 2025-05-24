@@ -46,7 +46,8 @@ class _ProfilePageState extends State<ProfilePage> {
         // Extract the rate
         double rate = data['rate'];
 
-        double priceInUsd = (controller.balance! / 100000000) * rate;
+        double priceInUsd =
+            (controller.ordinalWalletBalance! / 100000000) * rate;
 
         return priceInUsd;
       } else {
@@ -116,10 +117,11 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         onRefresh: () async {
           log('loading');
-
-          await controller.getBalance();
+          await controller.syncWallet();
+          await controller.getOrdinalWalletBalance();
+          await controller.getFundingWalletBalance();
           controller.getUtxo();
-          log(controller.address!);
+          log(controller.fundingAddress!);
         },
         child: NestedScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -225,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 ),
                                               ),
                                               Text(
-                                                "${controller.balance ?? 0} Sats",
+                                                "${controller.fundingWalletBalance ?? 0} Sats",
                                                 style: TextStyle(
                                                   color:
                                                       const Color(0xffb4914b),

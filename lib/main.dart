@@ -55,7 +55,8 @@ void main() async {
     controller.password = prefs.getString("password")!;
     log(controller.mnemonic!);
     log("start wallet creation");
-    await controller.createOrRestoreWallet();
+    await controller.createOrRestoreOrdinalWallet();
+    await controller.createOrRestoreFundingWallet();
     log("wallet created");
     controller.initWallet();
 

@@ -34,8 +34,8 @@ class _MintOrdinalsScreenState extends State<MintOrdinalsScreen> {
                         Map<String, dynamic> inscriptionData =
                             await inscriptionController.pickPictureAndEncode();
                         if (inscriptionData['success'] == true) {
-                          await inscriptionController.inscribe(
-                              inscriptionData, walletController.address!, 2);
+                          await inscriptionController.inscribe(inscriptionData,
+                              walletController.ordinalAddress!, 2);
                           if (inscriptionController.inscriptionModel != null) {
                             await inscriptionController.fetchOrderDetails(
                                 inscriptionController.inscriptionModel!.id);

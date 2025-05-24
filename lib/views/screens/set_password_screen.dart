@@ -50,12 +50,16 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
   }
 
   Future<void> goToHome() async {
-    await controller.createOrRestoreWallet();
+    await controller.createOrRestoreOrdinalWallet();
+    await controller.createOrRestoreFundingWallet();
 
-    await FirebaseUtils.users.doc(controller.address).get().then((value) async {
+    await FirebaseUtils.users
+        .doc(controller.ordinalAddress)
+        .get()
+        .then((value) async {
       try {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: "${controller.address}@alphago.com",
+          email: "${controller.ordinalAddress}@alphago.com",
           password: controller.password!,
         );
       } on FirebaseAuthException catch (e) {

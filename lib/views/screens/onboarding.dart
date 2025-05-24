@@ -34,7 +34,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    log(controller.address.toString());
+    log(controller.ordinalAddress.toString());
   }
 
   @override
@@ -97,7 +97,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         isUploading = true;
                       });
                       final mountainsRef = FirebaseUtils.userPfp
-                          .child('${controller.address}.jpg');
+                          .child('${controller.ordinalAddress}.jpg');
                       final XFile? image =
                           await picker.pickImage(source: ImageSource.gallery);
                       if (image != null) {
@@ -172,20 +172,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         await FirebaseChatCore.instance.createUserInFirestore(
                           types.User(
                             firstName: name.text,
-                            lastName: controller.address,
+                            lastName: controller.ordinalAddress,
                             id: user.uid, // UID from Firebase Authentication
                             imageUrl: userController.user.pfpUrl,
                           ),
                         );
                         userController.setUser(WalletUser(
                           pfpUrl: userController.user.pfpUrl,
-                          walletAddress: controller.address!,
+                          walletAddress: controller.ordinalAddress!,
                           accountName: name.text,
                           bio: bio.text,
                           externalLink: link.text,
                         ));
                         await FirebaseUtils.users
-                            .doc(controller.address)
+                            .doc(controller.ordinalAddress)
                             .set(userController.user.toJson());
                         context.pushReplacement('/home');
                       },

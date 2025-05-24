@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:searchfield/searchfield.dart';
+// import 'package:searchfield/searchfield.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final class Constants {
@@ -34,8 +34,8 @@ final class Constants {
     filled: true,
     fillColor: Colors.black.withValues(alpha: 0.7),
   );
-  static final SearchInputDecoration searchInputDecoration =
-      SearchInputDecoration();
+  // static final SearchInputDecoration searchInputDecoration =
+  //     SearchInputDecoration();
   static final appBarBottom = PreferredSize(
       preferredSize: Size.fromHeight(2.h),
       child: Container(
