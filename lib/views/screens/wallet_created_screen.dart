@@ -1,11 +1,11 @@
 import 'dart:developer';
 import 'package:alpha_go/models/const_model.dart';
-import 'package:alpha_go/views/screens/onboarding.dart';
 import 'package:alpha_go/controllers/wallet_controller.dart';
-import 'package:bdk_flutter/bdk_flutter.dart';
+import 'package:alpha_go/views/widgets/navbar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,17 +22,13 @@ class _WalletCreatedScreenState extends State<WalletCreatedScreen> {
   TextEditingController address = TextEditingController();
   TextEditingController balance = TextEditingController();
   final WalletController controller = Get.find();
-  final SharedPreferences prefs = Get.find();
+  final SharedPreferencesWithCache prefs = Get.find();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await controller
-          .createOrRestoreWallet(
-        Network.bitcoin,
-      )
-          .then((value) {
+      await controller.createOrRestoreWallet().then((value) {
         setState(() {
           address.text = controller.address!;
         });
@@ -60,113 +56,138 @@ class _WalletCreatedScreenState extends State<WalletCreatedScreen> {
       } catch (e) {
         log("An error has occured ${e.toString()}");
       }
-
-      await controller.syncWallet();
       await prefs.setString("mnemonic", controller.mnemonic!);
       await prefs.setString("password", controller.password!);
+      await controller.syncWallet();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/bg.jpg'), fit: BoxFit.cover)),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Wallet Created!"),
-          bottom: Constants.appBarBottom,
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-        ),
-        backgroundColor: Colors.transparent,
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Padding(
-                padding: EdgeInsets.only(top: 5.h, left: 5.w, right: 5.w),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Center(
-                        child: Text(
-                      "Congratulations your wallet is ${widget.isImport ? "imported" : "created"}",
-                      textAlign: TextAlign.center,
-                    )),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5.h),
-                      child: TextFormField(
-                          readOnly: true,
-                          controller: address,
-                          style: Constants.inputStyle,
-                          maxLines: 2,
-                          decoration: Constants.inputDecoration.copyWith(
-                              hintText: "Your Wallet Address",
-                              suffixIconColor: const Color(0xffb4914b),
-                              suffixIcon: IconButton(
-                                  onPressed: () async {
-                                    if (controller.address != null) {
-                                      await Clipboard.setData(ClipboardData(
-                                              text: controller.address!))
-                                          .then((onCallback) {
-                                        Get.snackbar('Copy Successfull',
-                                            'Your Wallet Address has been copied to your clipboard',
-                                            colorText: Colors.white);
-                                      });
-                                    }
-                                  },
-                                  icon: const Icon(
-                                    Icons.copy,
-                                  )))),
+    return PopScope(
+      canPop: false,
+      child: Container(
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/bg.jpg'), fit: BoxFit.cover)),
+        child: Scaffold(
+          appBar: CustomNavBar(
+            leadingWidget: const SizedBox(),
+            actionWidgets: SizedBox(
+              width: 76.w,
+              child: Row(
+                children: [
+                  Text(
+                    "Wallet Created!",
+                    style: TextStyle(
+                      color: const Color(0xFFB4914B), // Gold color
+                      fontSize: 20.sp,
+                      fontFamily: 'Cinzel',
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5.h),
-                      child: TextFormField(
-                          controller: balance,
-                          style: Constants.inputStyle,
-                          readOnly: true,
-                          keyboardType: TextInputType.multiline,
-                          maxLines: 2,
-                          decoration: Constants.inputDecoration.copyWith(
-                            hintText: "Please refresh to fetch wallet balance",
-                          )),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5.h),
-                      child: ElevatedButton(
-                        style: Constants.buttonStyle,
-                        onPressed: () async {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          await controller.syncWallet();
-                          await controller.getBalance().then((value) {
-                            balance.text =
-                                "${controller.balance.toString()} Sats";
-                          });
-                          setState(() {
-                            isLoading = false;
-                          });
-                          log("Refreshed");
-                        },
-                        child: const Text("Refresh"),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5.h),
-                      child: ElevatedButton(
-                        style: Constants.buttonStyle,
-                        onPressed: () {
-                          if (FirebaseAuth.instance.currentUser != null) {
-                            Get.off(const OnboardingScreen());
-                          }
-                        },
-                        child: const Text("Continue"),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          body: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Padding(
+                  padding: EdgeInsets.only(top: 5.h, left: 5.w, right: 5.w),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Center(
+                          child: Text(
+                        "Congratulations your wallet is ${widget.isImport ? "imported" : "created"}",
+                        textAlign: TextAlign.center,
+                      )),
+                      Padding(
+                        padding: EdgeInsets.only(top: 5.h),
+                        child: TextFormField(
+                            readOnly: true,
+                            controller: address,
+                            style: Constants.inputStyle,
+                            maxLines: 2,
+                            decoration: Constants.inputDecoration.copyWith(
+                                hintText: "Your Wallet Address",
+                                suffixIconColor: const Color(0xffb4914b),
+                                suffixIcon: IconButton(
+                                    onPressed: () async {
+                                      if (controller.address != null) {
+                                        await Clipboard.setData(ClipboardData(
+                                                text: controller.address!))
+                                            .then((onCallback) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Wallet Address Copied!',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              backgroundColor:
+                                                  Color(0xffb4914b),
+                                            ),
+                                          );
+                                        });
+                                      }
+                                    },
+                                    icon: const Icon(
+                                      Icons.copy,
+                                    )))),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 5.h),
+                        child: TextFormField(
+                            controller: balance,
+                            style: Constants.inputStyle,
+                            readOnly: true,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: 2,
+                            decoration: Constants.inputDecoration.copyWith(
+                              hintText:
+                                  "Please refresh to fetch wallet balance",
+                            )),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 5.h),
+                        child: ElevatedButton(
+                          style: Constants.buttonStyle,
+                          onPressed: () async {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            await controller.syncWallet();
+                            await controller.getBalance().then((value) {
+                              balance.text =
+                                  "${controller.balance.toString()} Sats";
+                            });
+                            setState(() {
+                              isLoading = false;
+                            });
+                            log("Refreshed");
+                          },
+                          child: const Text("Refresh"),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 5.h),
+                        child: ElevatedButton(
+                          style: Constants.buttonStyle,
+                          onPressed: () {
+                            if (FirebaseAuth.instance.currentUser != null) {
+                              context.pushReplacement('/onboarding');
+                            }
+                          },
+                          child: const Text("Continue"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
       ),
     );
   }

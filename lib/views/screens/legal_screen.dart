@@ -1,11 +1,11 @@
 import 'dart:developer';
 
 import 'package:alpha_go/models/const_model.dart';
-import 'package:alpha_go/views/screens/generate_mnemonic_screen.dart';
-import 'package:alpha_go/views/screens/import_mnemonic_screen.dart';
+import 'package:alpha_go/views/widgets/navbar_widget.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -18,7 +18,7 @@ class LegalPage extends StatefulWidget {
 }
 
 class LegalPageState extends State<LegalPage> {
-  bool isAuthorised = false;
+  bool isAuthorized = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -27,19 +27,31 @@ class LegalPageState extends State<LegalPage> {
               image: AssetImage("assets/bg.jpg"), fit: BoxFit.cover)),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          bottom: PreferredSize(
-              preferredSize: Size.fromHeight(1.h),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xffb4914b),
+        appBar: CustomNavBar(
+          leadingWidget: Padding(
+            padding: EdgeInsets.all(1.w),
+            child: IconButton(
+              onPressed: () {
+                Get.back();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: Color(0xFFB4914B)),
+            ),
+          ),
+          actionWidgets: SizedBox(
+            width: 75.w,
+            child: Row(
+              children: [
+                Text(
+                  "Legal",
+                  style: TextStyle(
+                    color: const Color(0xFFB4914B), // Gold color
+                    fontSize: 20.sp,
+                    fontFamily: 'Cinzel',
+                  ),
                 ),
-                height: 0.2.h,
-              )),
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          title: const Text(
-            "Legal",
+                const Spacer()
+              ],
+            ),
           ),
         ),
         body: Padding(
@@ -97,18 +109,18 @@ class LegalPageState extends State<LegalPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Authorise Data Collection"),
+                      const Text("Authorize Data Collection"),
                       SizedBox(
                         height: 4.h,
                         width: 20.w,
                         child: AnimatedToggleSwitch<bool>.dual(
-                          current: isAuthorised,
+                          current: isAuthorized,
                           first: false,
                           second: true,
                           fittingMode: FittingMode.preventHorizontalOverlapping,
                           onChanged: (bool value) => setState(() {
                             log(value.toString());
-                            isAuthorised = value;
+                            isAuthorized = value;
                           }),
                         ),
                       )
@@ -121,9 +133,11 @@ class LegalPageState extends State<LegalPage> {
                   height: 10.h,
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.to(() => widget.isGenerate
-                          ? const GenerateWalletMnemonic()
-                          : const EnterWalletMnemonic());
+                      context.push(
+                        widget.isGenerate
+                            ? '/generateMnemonic'
+                            : '/enterMnemonic',
+                      );
                     },
                     style: Constants.buttonStyle,
                     child: Text(

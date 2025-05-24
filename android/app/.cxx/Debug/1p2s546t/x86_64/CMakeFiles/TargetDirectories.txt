@@ -1,0 +1,2 @@
+C:/Users/hp/ALPHA-GO-FREELANCE-FLUTTER/alpha-go/android/app/.cxx/Debug/1p2s546t/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/hp/ALPHA-GO-FREELANCE-FLUTTER/alpha-go/android/app/.cxx/Debug/1p2s546t/x86_64/CMakeFiles/rebuild_cache.dir

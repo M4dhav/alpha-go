@@ -1,3 +1,20 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "cSpell.words": [
+        "alphago",
+        "Authorise",
+        "blockstream",
+        "Cinzel",
+        "esplora",
+        "Featureset",
+        "Getx",
+        "ltlng",
+        "mapbox",
+        "ordiscan",
+        "prefs",
+        "psbt",
+        "Roboto",
+        "Utxo",
+        "Utxos"
+    ]
 }

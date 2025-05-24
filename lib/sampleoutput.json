@@ -1,0 +1,45 @@
+{
+    "additionalFeeCharged": 0,
+    "baseFee": 5000,
+    "chainFee": 13412,
+    "charge": {
+        "address": "bc1p67u5y62vht4mz62pu6zdprkw4ajgagx33aj9fpt46grca9npcn3svr053w",
+        "amount": 18958,
+        "callback_url": ""
+    },
+    "completed": true,
+    "createdAt": 1743631279211,
+    "fee": 2,
+    "files": [
+        {
+            "completed": true,
+            "inscriptionId": "9f597b2af2f520302ace5a189fe52381406c248544aec0b517721b31b4e6c918i0",
+            "name": "1000183745.jpg",
+            "nonStandardTx": false,
+            "processing": false,
+            "s3Key": "60c7442a-0953-410a-ab1d-fc3d95a15930_1000183745.jpg",
+            "sent": "9f597b2af2f520302ace5a189fe52381406c248544aec0b517721b31b4e6c918",
+            "size": 26099,
+            "status": "completed",
+            "tx": {
+                "inscription": "9f597b2af2f520302ace5a189fe52381406c248544aec0b517721b31b4e6c918i0",
+                "reveal": "9f597b2af2f520302ace5a189fe52381406c248544aec0b517721b31b4e6c918",
+                "totalFees": 13412,
+                "updatedAt": 1743631301110
+            },
+            "type": "image/jpg",
+            "url": "https://ordinalsbot-prod.s3.amazonaws.com/60c7442a-0953-410a-ab1d-fc3d95a15930_1000183745.jpg"
+        }
+    ],
+    "id": "98f3e1f2-7035-4b23-ba13-338e4c105ed7",
+    "inscribedCount": 1,
+    "lowPostage": true,
+    "orderType": "direct",
+    "paid": true,
+    "postage": 546,
+    "processing": false,
+    "receiveAddress": "bc1pl3sr5ypgklv3xegcth5ufka57lv2n0sqjxmpuzhx2sgh2g9a2drqjrxzam",
+    "serviceFee": 5546,
+    "state": "mempool",
+    "status": "ok"
+}

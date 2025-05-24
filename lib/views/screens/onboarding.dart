@@ -1,16 +1,17 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:alpha_go/models/const_model.dart';
+import 'package:alpha_go/views/widgets/navbar_widget.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:alpha_go/controllers/user_controller.dart';
 import 'package:alpha_go/controllers/wallet_controller.dart';
 import 'package:alpha_go/models/firebase_model.dart';
 import 'package:alpha_go/models/user_model.dart';
-import 'package:alpha_go/views/screens/base_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -25,6 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool isUploading = false;
   TextEditingController name = TextEditingController();
   TextEditingController bio = TextEditingController();
+  TextEditingController link = TextEditingController();
   final WalletController controller = Get.find();
   final UserController userController = Get.find();
   final ImagePicker picker = ImagePicker();
@@ -45,11 +47,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               fit: BoxFit.cover)),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Create your profile'),
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          bottom: Constants.appBarBottom,
+        appBar: CustomNavBar(
+          leadingWidget: Padding(
+            padding: EdgeInsets.all(1.w),
+            child: IconButton(
+              onPressed: () {
+                Get.back();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: Color(0xFFB4914B)),
+            ),
+          ),
+          actionWidgets: SizedBox(
+            width: 76.w,
+            child: Row(
+              children: [
+                Text(
+                  "Create Your Profile",
+                  style: TextStyle(
+                    color: const Color(0xFFB4914B), // Gold color
+                    fontSize: 16.sp,
+                    fontFamily: 'Cinzel',
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         backgroundColor: Colors.transparent,
         body: Padding(
@@ -62,7 +84,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   radius: 70,
                   backgroundColor: const Color(0xffb4914b),
                   foregroundImage: !isUploading
-                      ? NetworkImage(userController.user.pfpUrl ?? "")
+                      ? NetworkImage(userController.user.pfpUrl)
                       : null,
                   child: isUploading ? const CircularProgressIndicator() : null,
                 ),
@@ -132,6 +154,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 5.h),
+                  child: TextFormField(
+                    style: Constants.inputStyle,
+                    cursorColor: Colors.white,
+                    decoration: Constants.inputDecoration.copyWith(
+                      labelStyle: const TextStyle(color: Colors.white),
+                      labelText: 'External Link',
+                    ),
+                    controller: link,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 5.h),
                   child: ElevatedButton(
                       style: Constants.buttonStyle,
                       onPressed: () async {
@@ -140,19 +174,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             firstName: name.text,
                             lastName: controller.address,
                             id: user.uid, // UID from Firebase Authentication
-                            imageUrl: userController.user.pfpUrl ?? "",
+                            imageUrl: userController.user.pfpUrl,
                           ),
                         );
                         userController.setUser(WalletUser(
-                          pfpUrl: userController.user.pfpUrl ?? "",
+                          pfpUrl: userController.user.pfpUrl,
                           walletAddress: controller.address!,
                           accountName: name.text,
                           bio: bio.text,
+                          externalLink: link.text,
                         ));
                         await FirebaseUtils.users
                             .doc(controller.address)
-                            .set(userController.toJson());
-                        Get.off(() => const NavBar());
+                            .set(userController.user.toJson());
+                        context.pushReplacement('/home');
                       },
                       child: const Text('Submit')),
                 ),

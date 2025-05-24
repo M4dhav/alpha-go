@@ -2,9 +2,9 @@ import 'dart:developer';
 
 import 'package:alpha_go/controllers/wallet_controller.dart';
 import 'package:alpha_go/models/const_model.dart';
-import 'package:alpha_go/views/screens/set_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class EnterWalletMnemonic extends StatefulWidget {
@@ -70,15 +70,19 @@ class _EnterWalletMnemonicState extends State<EnterWalletMnemonic> {
                           RegExp(r'^(?:[a-zA-Z]+(?:\s|$)){12}$');
                       log(mnemonicRegex.hasMatch(mnemonic.text).toString());
                       if (!mnemonicRegex.hasMatch(mnemonic.text)) {
-                        Get.snackbar("Invalid Seed Phrase",
-                            "Please enter a valid Seed Phrase",
-                            colorText: Colors.white);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Please enter a valid Seed Phrase",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
                         return;
                       }
                       controller.mnemonic = mnemonic.text;
-                      Get.to(() => const SetPasswordScreen(
-                            isImport: true,
-                          ));
+                      context.go('/setPassword', extra: [false, true]);
                     },
                     style: Constants.buttonStyle,
                     child: Text(

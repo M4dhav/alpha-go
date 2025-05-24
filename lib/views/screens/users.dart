@@ -1,5 +1,6 @@
 import 'package:alpha_go/models/const_model.dart';
-import 'package:alpha_go/views/screens/chat.dart';
+import 'package:alpha_go/views/screens/chat_screens/chat.dart';
+// import 'package:alpha_go/views/screens/chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;

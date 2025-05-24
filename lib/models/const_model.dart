@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final class Constants {
   static final ButtonStyle buttonStyle = ButtonStyle(
@@ -31,7 +32,7 @@ final class Constants {
     hintStyle: const TextStyle(color: Colors.white, fontFamily: 'Cinzel'),
     iconColor: Colors.white,
     filled: true,
-    fillColor: Colors.black.withOpacity(0.7),
+    fillColor: Colors.black.withValues(alpha: 0.7),
   );
   static final SearchInputDecoration searchInputDecoration =
       SearchInputDecoration();
@@ -46,4 +47,9 @@ final class Constants {
       ));
   static const inputStyle =
       TextStyle(color: Colors.white, fontFamily: 'Roboto');
+
+  // Environment variables from .env file
+  static String get mapboxStyleUrl => dotenv.get('MAPBOX_STYLE_URL');
+  static String get mapboxToken => dotenv.get('MAPBOX_TOKEN');
+  static String get ordiscanApiKey => dotenv.get('ORDISCAN_API_KEY');
 }

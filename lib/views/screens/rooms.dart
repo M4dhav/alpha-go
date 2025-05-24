@@ -1,9 +1,9 @@
-import 'package:alpha_go/models/const_model.dart';
-import 'package:alpha_go/views/screens/chat.dart';
+// import 'package:alpha_go/views/screens/chat.dart';
+import 'package:alpha_go/views/screens/chat_screens/chat.dart';
 import 'package:alpha_go/views/screens/users.dart';
+import 'package:alpha_go/views/widgets/navbar_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -105,31 +105,35 @@ class _RoomsPageState extends State<RoomsPage> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          foregroundColor: const Color(0xffb4914b),
-          bottom: Constants.appBarBottom,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: _user == null
-                  ? null
-                  : () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          fullscreenDialog: true,
-                          builder: (context) => const UsersPage(),
-                        ),
-                      );
-                    },
+        appBar: CustomNavBar(
+          leadingWidget: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 2.w),
+            child: const Text(
+              'Your Chats',
+              style: TextStyle(color: Color(0xffb4914b)),
             ),
-          ],
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          title: const Text('Rooms'),
+          ),
+          actionWidgets: IconButton(
+            icon: Icon(
+              Icons.add,
+              size: 35.px,
+              color: const Color(0xffb4914b),
+            ),
+            onPressed: _user == null
+                ? null
+                : () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (context) => const UsersPage(),
+                      ),
+                    );
+                  },
+          ),
         ),
         body: Padding(
           padding: EdgeInsets.only(
-            top: 1.h,
+            top: 2.h,
             left: 2.w,
             right: 2.w,
             bottom: 1.h,

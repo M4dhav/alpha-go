@@ -1,10 +1,10 @@
-
 import 'package:alpha_go/controllers/wallet_controller.dart';
 import 'package:alpha_go/models/const_model.dart';
-import 'package:alpha_go/views/screens/set_password_screen.dart';
+import 'package:alpha_go/views/widgets/navbar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class GenerateWalletMnemonic extends StatefulWidget {
@@ -36,13 +36,31 @@ class _GenerateWalletMnemonicState extends State<GenerateWalletMnemonic> {
               image: AssetImage("assets/bg.jpg"), fit: BoxFit.cover)),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          title: const Text(
-            'Backup your Seed Phrase',
+        appBar: CustomNavBar(
+          leadingWidget: Padding(
+            padding: EdgeInsets.all(1.w),
+            child: IconButton(
+              onPressed: () {
+                Get.back();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: Color(0xFFB4914B)),
+            ),
           ),
-          bottom: Constants.appBarBottom,
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
+          actionWidgets: SizedBox(
+            width: 76.w,
+            child: Row(
+              children: [
+                Text(
+                  "Backup your Seed Phrase",
+                  style: TextStyle(
+                    color: const Color(0xFFB4914B), // Gold color
+                    fontSize: 16.sp,
+                    fontFamily: 'Cinzel',
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         body: Padding(
           padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 5.h),
@@ -54,7 +72,8 @@ class _GenerateWalletMnemonicState extends State<GenerateWalletMnemonic> {
               Padding(
                 padding: EdgeInsets.only(top: 5.h),
                 child: TextFormField(
-                    style: const TextStyle(color: Colors.white, fontFamily: 'Roboto'),
+                    style: const TextStyle(
+                        color: Colors.white, fontFamily: 'Roboto'),
                     readOnly: true,
                     cursorColor: Colors.white,
                     controller: mnemonic,
@@ -69,9 +88,11 @@ class _GenerateWalletMnemonicState extends State<GenerateWalletMnemonic> {
                                 await Clipboard.setData(
                                         ClipboardData(text: mnemonic.text))
                                     .then((onCallback) {
-                                  Get.snackbar('Copy Successfull',
-                                      'Your Seed Phrase has been copied to your clipboard',
-                                      colorText: Colors.white);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            "Seed Phrase copied to clipboard!")),
+                                  );
                                 });
                               }
                             },
@@ -84,7 +105,7 @@ class _GenerateWalletMnemonicState extends State<GenerateWalletMnemonic> {
                 child: ElevatedButton(
                     style: Constants.buttonStyle,
                     onPressed: () {
-                      Get.to(() => const SetPasswordScreen());
+                      context.go('/setPassword', extra: [false, false]);
                     },
                     child: const Text("Continue")),
               ),
