@@ -9,6 +9,21 @@ class OrdinalListingController extends GetxController {
   var isLoading = false.obs;
   var errorMsg = ''.obs;
   var psbtBase64 = ''.obs;
+var listings = <OrdinalListingModel>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadListings();
+  }
+
+  Future<void> loadListings() async {
+    isLoading.value = true;
+    final fetched = await fetchAllListings();
+    listings.assignAll(fetched);
+    isLoading.value = false;
+  }
+
 Future<void> createPsbtAndListing({
     required Wallet wallet,
     required String inscriptionId,
@@ -42,7 +57,7 @@ Future<void> createPsbtAndListing({
       final txOut = TxOut(value: utxoValue, scriptPubkey: sellerScript);
 
       // Add the UTXO (ordinal) input
-      await txBuilder.addUtxo(outpoint); // since it belongs to seller wallet
+      txBuilder.addUtxo(outpoint); // since it belongs to seller wallet
       print("➕ Added owned UTXO to TxBuilder");
 
       // Add dummy output that buyer will replace
@@ -56,7 +71,7 @@ Future<void> createPsbtAndListing({
       print("✅ PSBT created");
 
       // Sign only the input — since seller is only signing their UTXO
-      final signed = await wallet.sign(psbt: psbt);
+      final signed = wallet.sign(psbt: psbt);
       print("🖊️ PSBT signed (input only)");
 
       // Serialize to Base64 to save for buyer
@@ -65,21 +80,21 @@ Future<void> createPsbtAndListing({
       print("📦 PSBT Base64: ${psbtB64.substring(0, 20)}...");
 
       // Save listing with PSBT to Firestore
-      final listing = OrdinalListingModel(
-        inscriptionId: inscriptionId,
-        utxo: Utxo(txid: txid, vout: vout, value: utxoValue.toInt()),
-        sellerAddress: sellerAddress,
-        price: price,
-        psbtInput: psbtB64,
-        metadata: metadata,
-        status: 'LISTED',
-        expiresAt: DateTime.now().add(Duration(days: expiresDays)),
-        createdAt: DateTime.now(),
-      );
+      // final listing = OrdinalListingModel(
+      //   inscriptionId: inscriptionId,
+      //   utxo: Utxo(txid: txid, vout: vout, value: utxoValue.toInt()),
+      //   sellerAddress: sellerAddress,
+      //   price: price,
+      //   psbtInput: psbtB64,
+      //   metadata: metadata,
+      //   status: 'LISTED',
+      //   expiresAt: DateTime.now().add(Duration(days: expiresDays)),
+      //   createdAt: DateTime.now(),
+      // );
 
-      await FirebaseFirestore.instance
-          .collection('ordinal_listing')
-          .add(listing.toJson());
+      // await FirebaseFirestore.instance
+      //     .collection('ordinal_listing')
+      //     .add(listing.toJson());
       print("✅ Listing saved to Firestore");
     } catch (e) {
       print("❌ Error in createPsbtAndListing: $e");
@@ -111,8 +126,54 @@ Future<void> createPsbtAndListing({
       return [];
     }
   }
+
+  Future<void> uploadSampleOrdinalListings() async {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('ordinal_listing');
+
+    List<OrdinalListingModel> sampleListings = List.generate(5, (index) {
+      final now = DateTime.now();
+      return OrdinalListingModel(
+        inscriptionId: 'ord$index Sample Data Sample Data',
+        utxo: Utxo(
+          txid: 'sampletxid$index',
+          vout: index,
+          value: 1000 + index * 100,
+        ),
+        sellerAddress: 'bc1qexampleaddress$index',
+        price: BigInt.from(100000 + index * 50000), // in sats
+        psbtInput: 'cHNidP8BAFICAAAA...', // dummy base64 string
+        metadata: 'https://picsum.photos/id/${index + 10}/400/400',
+        status: 'LISTED',
+        expiresAt: now.add(Duration(days: 7)),
+        createdAt: now.subtract(Duration(hours: index * 2)),
+        soldAt: null,
+        txid: null,
+        name: 'Ordinal NFT #$index',
+        description: 'A unique Ordinal NFT #$index',
+        traits: [
+          {'trait_type': 'Background', 'value': 'Black'},
+          {'trait_type': 'Rarity', 'value': index % 2 == 0 ? 'Common' : 'Rare'},
+        ],
+        collectionId: 'collection_${index % 2}',
+        collectionName: 'Sample Collection ${index % 2}',
+      );
+    });
+
+    for (final listing in sampleListings) {
+      try {
+        await collection.doc(listing.inscriptionId).set(listing.toJson());
+        print("✅ Uploaded: ${listing.name}");
+      } catch (e) {
+        print("❌ Error uploading ${listing.name}: $e");
+      }
+    }
+
+    print("🎉 Sample listings uploaded successfully.");
+  }
 }
  
+
 
 
 

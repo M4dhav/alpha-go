@@ -113,7 +113,7 @@ class CollectionDetailPage extends StatelessWidget {
                       final actualIndex = index - 4;
                       return InscriptionTileWidget(
                         inscription:
-                            inscriptionController.inscriptions[actualIndex],
+                            inscriptionController.inscriptions[actualIndex], ifPossibleToBuy: false,
                       );
                     } else {
                       // Loading spinner at the end

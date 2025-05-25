@@ -77,6 +77,8 @@ dependencies:
   local_auth: ^2.3.0
   flutter_dotenv: ^5.2.1
   shimmer: ^3.0.0
+  flutter_html: ^3.0.0
+  flutter_svg: ^2.1.0
   flutter_image_gallery_saver: ^0.0.2
 
 # dependency_overrides:
@@ -85,6 +87,7 @@ dependencies:
   #     url: https://github.com/knottx/image_gallery_saver.git
   #     ref: knottx-latest
 
+  flutter_chat_core: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
