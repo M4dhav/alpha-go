@@ -46,7 +46,6 @@ class WalletController extends GetxController {
       //         stopGap: BigInt.from(5),
       //         validateDomain: true)),
     );
-    //
     return blockchain;
   }
 
