@@ -245,6 +245,8 @@ class OrdinalListingScreen extends StatelessWidget {
                             walletController.syncWallet();
                             controller.isLoading.value = true;
 
+                            final wallet = walletController.fundingAddress;
+
                             final traits = traitsController.text
                                 .trim()
                                 .split(',')

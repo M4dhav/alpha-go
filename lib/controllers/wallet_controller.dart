@@ -33,8 +33,8 @@ class WalletController extends GetxController {
     blockchain = await Blockchain.create(
       config: BlockchainConfig.esplora(
           config: EsploraConfig(
-        // baseUrl: "https://blockstream.info/api/",
-        baseUrl: "https://mempool.space/api",
+        baseUrl: "https://blockstream.info/api/",
+        // baseUrl: "https://mempool.space/api",
 
         stopGap: BigInt.from(5),
         concurrency: 1,
@@ -63,7 +63,6 @@ class WalletController extends GetxController {
             secretKey: descriptorSecretKey, network: network, keychain: e);
         descriptors.add(descriptor);
       }
-
       return descriptors;
     } on Exception catch (e) {
       log(e.toString(), name: 'GetDescriptors');
@@ -467,11 +466,8 @@ class WalletController extends GetxController {
     required String listingId,
   }) async {
     try {
-      if (fundingWallet == null) {
-        await createOrRestoreFundingWallet();
-      }
-      await fundingWallet!.sync(blockchain: blockchain);
-      final fundingUtxos = await ordinalWallet.listUnspent();
+      await fundingWallet.sync(blockchain: blockchain);
+      final fundingUtxos = ordinalWallet.listUnspent();
       final builder = TxBuilder()
         ..addUtxos([ordinalUtxo.outpoint])
         ..addUtxos(fundingUtxos.map((u) => u.outpoint).toList())
@@ -483,12 +479,12 @@ class WalletController extends GetxController {
           ordinalUtxo.txout.value,
         )
         ..feeRate(1.0);
-      final (psbt, _) = await builder.finish(fundingWallet!);
-      await fundingWallet!.sign(psbt: psbt);
-      await ordinalWallet.sign(psbt: psbt);
-      final psbtBytes = await psbt.serialize();
+      final (psbt, _) = await builder.finish(fundingWallet);
+      fundingWallet.sign(psbt: psbt);
+      ordinalWallet.sign(psbt: psbt);
+      final psbtBytes = psbt.serialize();
       final psbtBase64 = base64Encode(psbtBytes);
-      log('PRINT PSBT (BIP49) ' + psbtBase64);
+      log('PRINT PSBT (BIP49) $psbtBase64');
       debugPrint("PSBT stored for listing $listingId");
     } catch (e, st) {
       log('Error in sellerCreateAndStoreTransactionWithBip49: $e\n$st');
