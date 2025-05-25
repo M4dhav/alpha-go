@@ -39,6 +39,13 @@ class OrdinalListingModel {
   final DateTime? soldAt;
   final String? txid;
 
+  // New fields
+  final String name;
+  final String description;
+  final List<Map<String, dynamic>> traits;
+  final String collectionId;
+  final String collectionName;
+
   OrdinalListingModel({
     required this.inscriptionId,
     required this.utxo,
@@ -51,6 +58,11 @@ class OrdinalListingModel {
     required this.createdAt,
     this.soldAt,
     this.txid,
+    required this.name,
+    required this.description,
+    required this.traits,
+    required this.collectionId,
+    required this.collectionName,
   });
 
   factory OrdinalListingModel.fromJson(Map<String, dynamic> json) {
@@ -66,17 +78,24 @@ class OrdinalListingModel {
       createdAt: DateTime.parse(json['createdAt']),
       soldAt: json['soldAt'] != null ? DateTime.parse(json['soldAt']) : null,
       txid: json['txid'],
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      traits: (json['traits'] as List<dynamic>?)
+              ?.map((e) => Map<String, dynamic>.from(e))
+              .toList() ??
+          [],
+      collectionId: json['collectionId'] ?? '',
+      collectionName: json['collectionName'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'inscriptionId': inscriptionId,
-     'ordinalUtxo': {
+      'ordinalUtxo': {
         ...utxo.toJson(),
         'address': sellerAddress,
       },
-
       'sellerAddress': sellerAddress,
       'price': price.toString(),
       'psbtSignedBase64': psbtInput,
@@ -86,6 +105,11 @@ class OrdinalListingModel {
       'createdAt': createdAt.toIso8601String(),
       'soldAt': soldAt?.toIso8601String(),
       'txid': txid,
+      'name': name,
+      'description': description,
+      'traits': traits,
+      'collectionId': collectionId,
+      'collectionName': collectionName,
     };
   }
 }

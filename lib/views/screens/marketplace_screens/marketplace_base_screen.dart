@@ -1,13 +1,20 @@
+import 'package:alpha_go/controllers/ordinal_listing_controller.dart';
 import 'package:alpha_go/views/widgets/navbar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:go_router/go_router.dart';
 
 class MarketPlaceBaseScreen extends StatelessWidget {
+  
+  
+      
   const MarketPlaceBaseScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Get.put(OrdinalListingController());
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -90,7 +97,7 @@ class MarketPlaceBaseScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 2.h),
                 child: InkWell(
                   onTap: () {
-                    context.push('/exploreCollections');
+                    context.push('/OrdinalBuy');
                   },
                   child: Container(
                     width: double.infinity,
@@ -142,11 +149,34 @@ class MarketPlaceBaseScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
-
-
-
-             
+             Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.h),
+                child: InkWell(
+                  onTap: () {
+                    context.push('/mintOrdinal');
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding:
+                        EdgeInsets.symmetric(vertical: 3.h, horizontal: 5.w),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border.all(color: Color(0xFFB4914B), width: 4.sp),
+                      borderRadius: BorderRadius.circular(16.sp),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Mint Ordinals",
+                        style: TextStyle(
+                          color: Color(0xFFB4914B),
+                          fontSize: 17.sp,
+                          fontFamily: 'Cinzel',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
              
              
             ],

@@ -7,8 +7,9 @@ import '../../models/inscription_model.dart';
 
 class InscriptionTileWidget extends StatefulWidget {
   final OrdinalInscription inscription;
+  final bool ifPossibleToBuy ;
 
-  const InscriptionTileWidget({super.key, required this.inscription});
+  const InscriptionTileWidget({super.key, required this.inscription, required this.ifPossibleToBuy});
 
   @override
   State<InscriptionTileWidget> createState() => _InscriptionTileWidgetState();
@@ -22,7 +23,14 @@ class _InscriptionTileWidgetState extends State<InscriptionTileWidget> {
         final InscriptionController controller = Get.find<InscriptionController>();
         await controller.fetchInscriptionDetail(widget.inscription.inscriptionId);
           if (!mounted) return; 
-          context.push('/inscriptionDetails');
+          if(widget.ifPossibleToBuy){
+            context.push('/inscriptionDetailsBuy');
+          }
+          else{
+            context.push('/inscriptionDetails');
+          }
+          
+          
 
       },
       child: Card(
